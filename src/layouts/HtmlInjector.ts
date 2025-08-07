@@ -7,9 +7,9 @@ import { htmlInjectorSettings } from 'utils/setting';
 const { saveSettingsDebounced, extensionSettings, setSetting, getSettings, getSignals } = htmlInjectorSettings
 // This function is called when the extension settings are changed in the UI
 function onExampleInput() {
-    extensionSettings.example_setting = "测试";
+    extensionSettings.example_setting = "test";
     saveSettingsDebounced();
-    setSetting('example_setting2', '测试');
+    setSetting('example_setting2', 'test');
 }
 const {
     lastMesTextContent,
@@ -24,7 +24,7 @@ const {
     saveTopPosition,
     hiddenEdgeControls,
 } = getSignals();
-// ---------------------------------------- 全局变量 --------------------------------
+// ---------------------------------------- Global Variables --------------------------------
 const chatElement = $<HTMLDivElement>('#chat');
 const observer = new MutationObserver((mutations) => {
     let canInject = false;
@@ -53,7 +53,7 @@ const observer = new MutationObserver((mutations) => {
         injectHtmlCode();
     }
 });
-// ---------------------------------------- 初始化 ----------------------------------------
+// ---------------------------------------- Initialization ----------------------------------------
 class IFrameManager {
     private static instance: IFrameManager;
     private resizeObservers: Map<HTMLIFrameElement, ResizeObserver> = new Map();
@@ -81,21 +81,21 @@ class IFrameManager {
             width: '100%',
             border: 'none',
             marginTop: '10px',
-            transition: 'height 0.3s ease' // 添加平滑过渡效果
+            transition: 'height 0.3s ease' // Add smooth transition effect
         });
     }
 
     private setupIframeEventListeners(iframe: HTMLIFrameElement): void {
         iframe.onload = () => {
             this.adjustIframeHeight(iframe);
-            // 延迟再次调整以确保内容完全加载
+            // Delay adjustment to ensure content is fully loaded
             setTimeout(() => this.adjustIframeHeight(iframe), 500);
 
-            // 设置初始主题
+            // Set initial theme
             this.updateIframeTheme(iframe, getSystemTheme());
         };
 
-        // 创建并存储 ResizeObserver
+        // Create and store ResizeObserver
         if (iframe.contentWindow) {
             const resizeObserver = new ResizeObserver(() => this.adjustIframeHeight(iframe));
             this.resizeObservers.set(iframe, resizeObserver);
@@ -118,7 +118,7 @@ class IFrameManager {
                 iframe.style.height = `${height + 5}px`;
             }
         } catch (error) {
-            console.error('调整iframe高度失败:', error);
+            console.error('Failed to adjust iframe height:', error);
         }
     }
 
@@ -126,12 +126,12 @@ class IFrameManager {
         try {
             iframe.contentWindow?.postMessage({ type: 'themeChange', theme }, '*');
         } catch (error) {
-            console.error('更新iframe主题失败:', error);
+            console.error('Failed to update iframe theme:', error);
         }
     }
 
     public removeIframe(iframe: HTMLIFrameElement): void {
-        // 清理 ResizeObserver
+        // Clean up ResizeObserver
         const observer = this.resizeObservers.get(iframe);
         if (observer) {
             observer.disconnect();
@@ -145,7 +145,7 @@ class IFrameManager {
             <html>
     <head>
         <style>
-            /* 自定义样式 */
+            /* Custom styles */
             ::-webkit-scrollbar {
                 width: 8px;
                 height: 8px;
@@ -250,7 +250,7 @@ class IFrameManager {
 
 
 
-// 修改 removeInjectedIframes 函数
+// Modified removeInjectedIframes function
 function removeInjectedIframes() {
     const iframeManager = IFrameManager.getInstance();
     const iframes = document.querySelectorAll<HTMLIFrameElement>('.mes_text iframe');
@@ -306,7 +306,7 @@ function injectHtmlCode(specificMesText = null as Element | null) {
             if (displayMode.get() === 2) {
                 const details = document.createElement('details');
                 const summary = document.createElement('summary');
-                summary.textContent = '[原代码]';
+                summary.textContent = '[Original Code]';
                 details.appendChild(summary);
                 codeElement.parentNode?.insertBefore(details, codeElement);
                 details.appendChild(codeElement);
@@ -318,11 +318,11 @@ function injectHtmlCode(specificMesText = null as Element | null) {
             mesText.appendChild(iframe);
         }
     } catch (error) {
-        console.error('HTML注入失败:', error);
+        console.error('HTML injection failed:', error);
     }
 }
 
-// ---------------------------------------- 辅助函数 ----------------------------------------
+// ---------------------------------------- Helper Functions ----------------------------------------
 function adjustIframeHeight(iframe: HTMLIFrameElement) {
     try {
         if (iframe.contentWindow?.document.body) {
@@ -330,7 +330,7 @@ function adjustIframeHeight(iframe: HTMLIFrameElement) {
             iframe.style.height = `${height + 5}px`;
         }
     } catch (error) {
-        console.error('调整iframe高度失败:', error);
+        console.error('Failed to adjust iframe height:', error);
     }
 }
 function getSystemTheme() {
@@ -347,7 +347,7 @@ function updateAllIframesTheme() {
                 iframe.contentWindow.postMessage({ type: 'themeChange', theme: getSystemTheme() }, '*');
             }
         } catch (error) {
-            console.error('更新iframe主题失败:', error);
+            console.error('Failed to update iframe theme:', error);
         }
     });
 }
@@ -386,7 +386,7 @@ function handleMessage(event: MessageEvent) {
             }
         }
     } catch (error) {
-        console.error('处理消息失败:', error);
+        console.error('Failed to handle message:', error);
     }
 }
 class SettingsPanel extends SignalWatcher(LitElement) {
@@ -401,72 +401,72 @@ class SettingsPanel extends SignalWatcher(LitElement) {
         this.classList.add('drawer');
         return html`
         <div id="html-injector-settings-header" class="inline-drawer-header">
-                <span class="inline-drawer-title">HTML注入器设置</span>
+                <span class="inline-drawer-title">HTML Injector Settings</span>
                 <div id="html-injector-close-settings" class="inline-drawer-icon fa-solid fa-circle-xmark" @click=${this.toggleSettingsPanel}></div>
             </div>
             <div id="settings-content">
                 <div class="settings-section">
-                    <h3 class="settings-subtitle">边缘控制面板位置</h3>
+                    <h3 class="settings-subtitle">Edge Control Panel Position</h3>
                 <select id="edge-controls-position" class="settings-select theme-element" @change=${this.handleSavePositionChange}>
-                    <option value="top-right"            .selected=${savedPosition.get() === "top-right"}>界面右上角</option>
-                    <option value="right-three-quarters" .selected=${savedPosition.get() === "right-three-quarters"}>界面右侧3/4位置</option>
-                    <option value="right-middle"         .selected=${savedPosition.get() === "right-middle"}>界面右侧中间</option>
-                    <option value="top-left"             .selected=${savedPosition.get() === "top-left"}>界面左上角</option>
-                    <option value="left-three-quarters"  .selected=${savedPosition.get() === "left-three-quarters"}>界面左侧3/4位置</option>
-                    <option value="left-middle"          .selected=${savedPosition.get() === "left-middle"}>界面左侧中间</option>
-                    <option value="custom"               .selected=${savedPosition.get() === "custom"}>自定义位置</option>
-                    <option value="hidden"               .selected=${savedPosition.get() === "hidden"}>隐藏</option>
+                    <option value="top-right"            .selected=${savedPosition.get() === "top-right"}>Top Right of Interface</option>
+                    <option value="right-three-quarters" .selected=${savedPosition.get() === "right-three-quarters"}>Right Side 3/4 Position</option>
+                    <option value="right-middle"         .selected=${savedPosition.get() === "right-middle"}>Right Side Middle</option>
+                    <option value="top-left"             .selected=${savedPosition.get() === "top-left"}>Top Left of Interface</option>
+                    <option value="left-three-quarters"  .selected=${savedPosition.get() === "left-three-quarters"}>Left Side 3/4 Position</option>
+                    <option value="left-middle"          .selected=${savedPosition.get() === "left-middle"}>Left Side Middle</option>
+                    <option value="custom"               .selected=${savedPosition.get() === "custom"}>Custom Position</option>
+                    <option value="hidden"               .selected=${savedPosition.get() === "hidden"}>Hidden</option>
 
                 </select>
                 </div>
                 <div class="settings-section">
-                <h3 class="settings-subtitle">显示模式</h3>
-                <label class="settings-option"><input type="radio" name="display-mode" value="1" .checked=${displayMode.get() === 1} @change=${this.handleDisplayModeChange}> 原代码和注入效果一起显示</label>
-                <label class="settings-option"><input type="radio" name="display-mode" value="2" .checked=${displayMode.get() === 2} @change=${this.handleDisplayModeChange}> 原代码以摘要形式显示</label>
-                <label class="settings-option"><input type="radio" name="display-mode" value="3" .checked=${displayMode.get() === 3} @change=${this.handleDisplayModeChange}> 隐藏原代码，只显示注入效果</label>
+                <h3 class="settings-subtitle">Display Mode</h3>
+                <label class="settings-option"><input type="radio" name="display-mode" value="1" .checked=${displayMode.get() === 1} @change=${this.handleDisplayModeChange}> Original code and injection effect</label>
+                <label class="settings-option"><input type="radio" name="display-mode" value="2" .checked=${displayMode.get() === 2} @change=${this.handleDisplayModeChange}> Original code as summary</label>
+                <label class="settings-option"><input type="radio" name="display-mode" value="3" .checked=${displayMode.get() === 3} @change=${this.handleDisplayModeChange}> Hide original code, only show effect</label>
             </div>
                 <div class="settings-section">
-                    <h3 class="settings-subtitle">激活楼层</h3>
+                    <h3 class="settings-subtitle">Active Levels</h3>
                     <select id="activation-mode" class="settings-select theme-element" @change=${this.handleActivationModeChange} >
-                        <option value="all"    .selected=${activationMode.get() === "all"}>全部楼层</option>
-                        <option value="first"  .selected=${activationMode.get() === "first"}>第一层</option>
-                        <option value="last"   .selected=${activationMode.get() === "last"}>最后一层</option>
-                        <option value="lastN"  .selected=${activationMode.get() === "lastN"}>最后N层</option>
-                        <option value="custom" .selected=${activationMode.get() === "custom"}>自定义楼层</option>
+                        <option value="all"    .selected=${activationMode.get() === "all"}>All Levels</option>
+                        <option value="first"  .selected=${activationMode.get() === "first"}>First Level</option>
+                        <option value="last"   .selected=${activationMode.get() === "last"}>Last Level</option>
+                        <option value="lastN"  .selected=${activationMode.get() === "lastN"}>Last N Levels</option>
+                        <option value="custom" .selected=${activationMode.get() === "custom"}>Custom Levels</option>
                     </select>
                     <div id="custom-floor-settings" class="settings-subsection" style=${styleMap({
             display: activationMode.get() === 'custom' ? 'block' : 'none'
         })} ${ref(this.customFloorSettingsRef)}>
-                        <label class="settings-option">起始楼层: <input type="number" id="custom-start-floor" min="1" .value=${customStartFloor.get().toString()} @change=${this.handleCustomStartFloorChange}></label>
-                        <label class="settings-option">结束楼层: <input type="number" id="custom-end-floor" min="-1" .value=${customEndFloor.get().toString()} @change=${this.handleCustomEndFloorChange}></label>
-                        <p class="settings-note">（-1 表示最后一层）</p>
+                        <label class="settings-option">Start Level: <input type="number" id="custom-start-floor" min="1" .value=${customStartFloor.get().toString()} @change=${this.handleCustomStartFloorChange}></label>
+                        <label class="settings-option">End Level: <input type="number" id="custom-end-floor" min="-1" .value=${customEndFloor.get().toString()} @change=${this.handleCustomEndFloorChange}></label>
+                        <p class="settings-note">(-1 means the last level)</p>
                     </div>
                     <div id="last-n-settings" class="settings-subsection" style=${styleMap({
             display: activationMode.get() === 'lastN' ? 'block' : 'none'
         })} ${ref(this.LastSettingsRef)} >
-                        <label class="settings-option">最后 <input type="number" id="last-n-floors" min="1" .value=${customEndFloor.get().toString()}  @change=${this.handleLastNFloorsChange}> 层</label>
+                        <label class="settings-option">Last <input type="number" id="last-n-floors" min="1" .value=${customEndFloor.get().toString()}  @change=${this.handleLastNFloorsChange}> Levels</label>
                     </div>
                 </div>
             </div>
             <div class="settings-footer">
-                <p>安全提醒：请仅注入您信任的代码。不安全的代码可能会对您的系统造成潜在风险。</p>
-                <p>注意：要注入的 HTML 代码应该用 \`\`\` 包裹，例如：</p>
+                <p>Security Reminder: Only inject code you trust. Unsafe code may pose potential risks to your system.</p>
+                <p>Note: The HTML code to be injected should be wrapped with \`\`\`, for example:</p>
                 <pre class="code-example">
 \`\`\`
 &lt;h1&gt;Hello, World!&lt;/h1&gt;
 &lt;p&gt;This is an example.&lt;/p&gt;
 \`\`\`
         </pre>
-        <p>以下是对应ST酒馆功能的特殊类名及简单的使用方法：</p>
+        <p>The following are special class names corresponding to ST Tavern features and simple usage:</p>
         <pre class="code-example">
 \`\`\`
-&lt;button class="qr-button"&gt;(你的QR按钮名字)&lt;/button&gt;
-&lt;textarea class="st-text"&gt;(对应酒馆的输入文本框，输入内容会同步到酒馆的文本框里)&lt;/textarea&gt;
-&lt;button class="st-send-button"&gt;(对应酒馆的发送按钮)&lt;/button&gt;
+&lt;button class="qr-button"&gt;(Your QR button name)&lt;/button&gt;
+&lt;textarea class="st-text"&gt;(Corresponds to Tavern's input text box, input will sync to Tavern's box)&lt;/textarea&gt;
+&lt;button class="st-send-button"&gt;(Corresponds to Tavern's send button)&lt;/button&gt;
 \`\`\`
                 </pre>
-                <p>【注意】通过JavaScript动态插入st-text框的内容同步到st酒馆的输入框需要处理时间，如果需要同步，请添加一个小延迟来确保文本有时间进行同步.</p>
-                <a href="https://discord.com/channels/1134557553011998840/1271783456690409554" target="_blank"> →Discord教程帖指路← 有详细说明与gal界面等模版 </a>
+                <p>[Note] Synchronizing dynamically inserted content of st-text box to Tavern's input box requires some time. If you need to sync, please add a small delay to ensure the text has time to sync.</p>
+                <a href="https://discord.com/channels/1134557553011998840/1271783456690409554" target="_blank"> →Discord tutorial post← with detailed explanations and gal interface templates </a>
             </div>
         `
     }
@@ -622,7 +622,7 @@ class EdgeControls extends SignalWatcher(LitElement) {
                 <input type="checkbox" id="edge-injection-toggle" @change=${this.handleToggleChange} .checked=${isInjectionEnabled.get()}>
                 <span class="html-injector-slider"></span>
             </label>
-            <button id="html-injector-toggle-panel" class="html-injector-button menu_button" @click=${this.toggleSettingsPanel}>${isVisibleSettingsPanel.get() ? "显示面板" : "隐藏面板"}</button>
+            <button id="html-injector-toggle-panel" class="html-injector-button menu_button" @click=${this.toggleSettingsPanel}>${isVisibleSettingsPanel.get() ? "Show Panel" : "Hide Panel"}</button>
             <button id="toggle-edge-controls" style=${styleMap(this.toggleEdgeButtonStyle)}
             @click=${this.handleToggleEdgeControls}
             >
@@ -661,7 +661,7 @@ class EdgeControls extends SignalWatcher(LitElement) {
         const value = isEdgeControlsCollapsed.get();
         const position = savedPosition.get();
         const isLeft = position.includes('left');
-        // 更新切换按钮文本和面板位置
+        // Update toggle button text and panel position
         const toggleButton = event.target as HTMLElement;
         if (isLeft) {
             this.style.left = value ? '-100px' : '0';
@@ -672,7 +672,7 @@ class EdgeControls extends SignalWatcher(LitElement) {
             this.style.left = 'auto';
             toggleButton.textContent = value ? '<<' : '>>';
         }
-        // 更新按钮样式
+        // Update button style
         this.toggleEdgeButtonStyle = {
             ...this.toggleEdgeButtonStyle,
             ...(isLeft ? {
@@ -705,15 +705,15 @@ class EdgeControls extends SignalWatcher(LitElement) {
         this.updateEdgeControlsPosition(savedPosition.get());
     }
     updateEdgeControlsPosition(position: string) {
-        // 确定是左侧还是右侧
+        // Determine if it's on the left or right
         const isLeft = position.includes('left');
-        // 更新面板的样式类
+        // Update the panel's style class
         if (isLeft) {
             this.classList.add('left-side');
         } else {
             this.classList.remove('left-side');
         }
-        // 设置垂直位置
+        // Set vertical position
         switch (position) {
             case 'top-right':
             case 'top-left':
@@ -736,7 +736,7 @@ class EdgeControls extends SignalWatcher(LitElement) {
                 break;
 
         }
-        // 设置水平位置
+        // Set horizontal position
         if (isLeft) {
             this.style.left = isEdgeControlsCollapsed.get() ? '-100px' : '0';
             this.style.right = 'auto';
@@ -744,7 +744,7 @@ class EdgeControls extends SignalWatcher(LitElement) {
             this.style.right = isEdgeControlsCollapsed.get() ? '-100px' : '0';
             this.style.left = 'auto';
         }
-        // 更新切换按钮的样式
+        // Update toggle button style
         this.toggleEdgeButtonStyle = {
             ...this.toggleEdgeButtonStyle,
             ...(isLeft ? {
@@ -757,7 +757,7 @@ class EdgeControls extends SignalWatcher(LitElement) {
                 borderRadius: '5px 0 0 5px'
             })
         };
-        this.requestUpdate(); // 请求更新以应用新的样式
+        this.requestUpdate(); // Request update to apply new styles
     }
 }
 
@@ -777,7 +777,7 @@ export function initInjector() {
     }
     document.body.appendChild(settingsPanel);
     document.body.appendChild(edgeControls);
-    // 确保初始位置和样式正确
+    // Ensure initial position and styles are correct
     edgeControls.updateEdgeControlsPosition(position);
     window.addEventListener("resize", () => {
         edgeControls.updatePosition();
@@ -789,4 +789,3 @@ export function initInjector() {
         subtree: true
     })
 }
-
